@@ -45,7 +45,9 @@ reg [8*num_pixels:0] blue_sum;
 integer i;	//For for loop
 integer index;
 
-reg [7:0] temp;
+reg [7:0] temp_r;
+reg [7:0] temp_g;
+reg [7:0] temp_b;
 reg [17:0] distance; // 256*256*3 is maximum possible
 
 // STATE VARIABLES
@@ -89,7 +91,9 @@ begin
         green_sum <= 8'bXXXXXXXX; // change based on num_pixels
         blue_sum <= 8'bXXXXXXXX; // change based on num_pixels
 
-		temp <= 8'bXXXXXXXX;
+		temp_r <= 8'bXXXXXXXX;
+		temp_g <= 8'bXXXXXXXX;
+		temp_b <= 8'bXXXXXXXX;
 		distance <= 18'bXXXXXXXXXXXXXXXXXX;
 	end
 	case (state)
@@ -108,7 +112,9 @@ begin
 	        green_sum <= 8'bXXXXXXXX; // change based on num_pixels
 	        blue_sum <= 8'bXXXXXXXX; // change based on num_pixels
 
-			temp <= 8'bXXXXXXXX;
+			temp_r <= 8'bXXXXXXXX;
+			temp_g <= 8'bXXXXXXXX;
+			temp_b <= 8'bXXXXXXXX;
 			distance <= 18'bXXXXXXXXXXXXXXXXXX;
 		end
 	    SUM_INIT: 
@@ -124,15 +130,15 @@ begin
 	        // map 1D vector to 2D vector
 	        for(i = 0; i < num_pixels * 8; i=i+8)
 	        begin
-	        	red[index] <= 9'd61; //{red_in[i+7], red_in[i+6], red_in[i+5], red_in[i+4], red_in[i+3], red_in[i+1], red_in[i]};
-	        	green[index] <= 9'd133; //{green_in[i+7], green_in[i+6], green_in[i+5], green_in[i+4], green_in[i+3], green_in[i+1], green_in[i]};
-	        	blue[index] <= 9'd198; //{blue_in[i+7], blue_in[i+6], blue_in[i+5], blue_in[i+4], blue_in[i+3], blue_in[i+1], blue_in[i]};
-	        	index = index + 1;
+	        	red[0] <= {red_in[i+7], red_in[i+6], red_in[i+5], red_in[i+4], red_in[i+3], red_in[i+2], red_in[i+1], red_in[i]};
+	        	green[0] <= {green_in[i+7], green_in[i+6], green_in[i+5], green_in[i+4], green_in[i+3],  green_in[i+2], green_in[i+1], green_in[i]};
+	        	blue[0] <= {blue_in[i+7], blue_in[i+6], blue_in[i+5], blue_in[i+4], blue_in[i+3],  blue_in[i+2], blue_in[i+1], blue_in[i]};
+	        	index <= index + 1;
 	        end
 	      end
 	    SUM_ADD: 
 	      begin
-	        if(counter == num_pixels)
+	        if(counter == (num_pixels - 1))
 	        	state <= SUM_DONE;
 	        else begin
 	        	state <= SUM_ADD;
@@ -161,14 +167,14 @@ begin
 	        // map 1D vector to 2D vector
 	        for(i = 0; i < num_pixels * 8; i=i+8)
 	        begin
-				red[index] <= 9'd61; //{red_in[i+7], red_in[i+6], red_in[i+5], red_in[i+4], red_in[i+3], red_in[i+1], red_in[i]};
-	        	green[index] <= 9'd133; //{green_in[i+7], green_in[i+6], green_in[i+5], green_in[i+4], green_in[i+3], green_in[i+1], green_in[i]};
-	        	blue[index] <= 9'd198; //{blue_in[i+7], blue_in[i+6], blue_in[i+5], blue_in[i+4], blue_in[i+3], blue_in[i+1], blue_in[i]};
+	        	red[0] <= {red_in[i+7], red_in[i+6], red_in[i+5], red_in[i+4], red_in[i+3], red_in[i+2], red_in[i+1], red_in[i]};
+	        	green[0] <= {green_in[i+7], green_in[i+6], green_in[i+5], green_in[i+4], green_in[i+3],  green_in[i+2], green_in[i+1], green_in[i]};
+	        	blue[0] <= {blue_in[i+7], blue_in[i+6], blue_in[i+5], blue_in[i+4], blue_in[i+3],  blue_in[i+2], blue_in[i+1], blue_in[i]};
 	        end
 	      end
 	    BG_REPLACE: 
 	      begin
-	        if(counter == num_pixels)
+	        if(counter == (num_pixels - 1))
 	        	state <= BG_ALMOST_DONE;
 	        else begin
 	        	state <= BG_REPLACE;
@@ -181,9 +187,13 @@ begin
 	        
 	        // compare to threshold
 	        if(distance > threshold) // if true, foreground --> same value
-	        	red[counter] <= red[counter];
+	        	red[0] <= red[0];
+				green[0] <= green[0];
+				blue[0] <= blue[0];
 	        else begin
-	        	red[counter] <= desired_bg;
+	        	red[0] <= desired_bg;
+				green[0] <= desired_bg;
+				blue[0] <= desired_bg;
 	        end
 	        counter <= counter + 1;
 	      end
@@ -192,35 +202,35 @@ begin
 			state <= BG_DONE;
 	      	for(index = 0; index < num_pixels; index=index+1)
 	        begin
-	        	temp <= red[index];
-	        	red_out[i] = temp[0];
-	        	red_out[i+1] = temp[1];
-	        	red_out[i+2] = temp[2];
-	        	red_out[i+3] = temp[3];
-	        	red_out[i+4] = temp[4];
-	        	red_out[i+5] = temp[5];
-	        	red_out[i+6] = temp[6];
-	        	red_out[i+7] = temp[7];
+	        	temp_r = red[0];
+	        	red_out[0] = temp_r[0];
+	        	red_out[1] = temp_r[1];
+	        	red_out[2] = temp_r[2];
+	        	red_out[3] = temp_r[3];
+	        	red_out[4] = temp_r[4];
+	        	red_out[5] = temp_r[5];
+	        	red_out[6] = temp_r[6];
+	        	red_out[7] = temp_r[7];
 
-	        	temp <= green[index];
-	        	green_out[i] = temp[0];
-	        	green_out[i+1] = temp[1];
-	        	green_out[i+2] = temp[2];
-	        	green_out[i+3] = temp[3];
-	        	green_out[i+4] = temp[4];
-	        	green_out[i+5] = temp[5];
-	        	green_out[i+6] = temp[6];
-	        	green_out[i+7] = temp[7];
+	        	temp_g = green[0];
+	        	green_out[0] = temp_g[0];
+	        	green_out[1] = temp_g[1];
+	        	green_out[2] = temp_g[2];
+	        	green_out[3] = temp_g[3];
+	        	green_out[4] = temp_g[4];
+	        	green_out[5] = temp_g[5];
+	        	green_out[6] = temp_g[6];
+	        	green_out[7] = temp_g[7];
 
-	        	temp <= blue[index];
-	        	blue_out[i] = temp[0];
-	        	blue_out[i+1] = temp[1];
-	        	blue_out[i+2] = temp[2];
-	        	blue_out[i+3] = temp[3];
-	        	blue_out[i+4] = temp[4];
-	        	blue_out[i+5] = temp[5];
-	        	blue_out[i+6] = temp[6];
-	        	blue_out[i+7] = temp[7];
+	        	temp_b = blue[0];
+	        	blue_out[0] = temp_b[0];
+	        	blue_out[1] = temp_b[1];
+	        	blue_out[2] = temp_b[2];
+	        	blue_out[3] = temp_b[3];
+	        	blue_out[4] = temp_b[4];
+	        	blue_out[5] = temp_b[5];
+	        	blue_out[6] = temp_b[6];
+	        	blue_out[7] = temp_b[7];
 
 	        	i = i+8;
 	        end

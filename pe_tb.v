@@ -29,6 +29,10 @@ module pe_testbench();
 	wire [8*num_pixels:0] green_out;
 	wire [8*num_pixels:0] blue_out;
 	
+	wire [8*num_pixels:0] red_sum;
+	wire [8*num_pixels:0] green_sum;
+	wire [8*num_pixels:0] blue_sum;
+	
 	integer i;
 
 	pe processor1(Clk, Ack, Reset, red_exp, green_exp, blue_exp, threshold, desired_bg, Start_Sum, Start_BgRemoval,
@@ -45,15 +49,19 @@ module pe_testbench();
 		Reset = 1; // perform reset 
 		#(5*ClkPeriod+HalfClkPeriod); 
 		Reset = 0;
-		#(HalfClkPeriod);
+		#(ClkPeriod);
 		
 		red_in <= 61;
 		green_in <= 133;
 		blue_in <= 198;
+		red_exp <= 61;
+		green_exp <= 133;
+		blue_exp <= 198;
 		Start_Sum <= 1;
 		Start_BgRemoval <= 0;
 		Reset <= 0;
 		Ack <= 0;
+		desired_bg <= 10;
 		
 		#(ClkPeriod);
 		
