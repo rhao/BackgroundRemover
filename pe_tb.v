@@ -79,6 +79,14 @@ module pe_testbench();
 		blue_in <= {8'd198,8'd198,8'd198,8'd0};
 		threshold <= 60; // threshold value
 
+		$display("Pixels before background replacement are: ");
+		for(i = 0; i < num_pixels; i = i + 1) begin
+			output_red = {red_in[i*8+7], red_in[i*8+6], red_in[i*8+5], red_in[i*8+4], red_in[i*8+3], red_in[i*8+2], red_in[i*8+1], red_in[i*8]};
+			output_green = {green_in[i*8+7], green_in[i*8+6], green_in[i*8+5], green_in[i*8+4], green_in[i*8+3], green_in[i*8+2], green_in[i*8+1], green_in[i*8]};
+			output_blue = {blue_in[i*8+7], blue_in[i*8+6], blue_in[i*8+5], blue_in[i*8+4], blue_in[i*8+3], blue_in[i*8+2], blue_in[i*8+1], blue_in[i*8]};
+			$display("%d,%d,%d;", output_red, output_green, output_blue);
+		end
+		
 		red_exp <= red_sum / num_processors; // TODO: red_sum1 + red_sum2 for the different processors
 		green_exp <= green_sum / num_processors;
 		blue_exp <= blue_sum / num_processors;
