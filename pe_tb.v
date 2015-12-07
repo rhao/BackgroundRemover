@@ -63,8 +63,12 @@ module pe_testbench();
 		
 		Ack <= 1;
 		Start_Sum <= 0;
-		
-		#50;
+
+		// don't know how long summing will take, so loop until you enter done state
+		while(~Qsd)
+		begin
+			#(HalfClkPeriod);
+		end
 		
 		// set values for background removal
 		red_in <= 61; // rgb of image to analyze
@@ -81,7 +85,10 @@ module pe_testbench();
 		#(ClkPeriod);
 		Start_BgRemoval <= 0;
 		
-		#50;
+		while(~Qbgd)
+		begin
+			#(HalfClkPeriod);
+		end
 
 		$display("Pixels after background replacement are: ");
 		for(i = 0; i < 25; i = i + 1) begin
