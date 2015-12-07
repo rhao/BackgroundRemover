@@ -9,7 +9,7 @@ module pe_testbench();
 	localparam num_processors = 1;
 	reg Clk;
 	
-	parameter num_pixels = 4;
+	localparam num_pixels = 4;
 
 	// BG REMOVAL VARIABLES
 	reg [7:0] red_exp;
@@ -37,7 +37,7 @@ module pe_testbench();
 	
 	integer i;
 
-	pe processor1(Clk, Ack, Reset, red_exp, green_exp, blue_exp, threshold, desired_bg_r, desired_bg_g, desired_bg_b, Start_Sum, Start_BgRemoval,
+	pe #(num_pixels) processor1(Clk, Ack, Reset, red_exp, green_exp, blue_exp, threshold, desired_bg_r, desired_bg_g, desired_bg_b, Start_Sum, Start_BgRemoval,
 					red_in, green_in, blue_in, red_out, green_out, blue_out,
 					Qi, Qbgi, Qbg, Qbgd, Qsi, Qs, Qsd, red_sum, green_sum, blue_sum);
 	
@@ -111,7 +111,12 @@ module pe_testbench();
 			output_blue = {blue_out[i*8+7], blue_out[i*8+6], blue_out[i*8+5], blue_out[i*8+4], blue_out[i*8+3], blue_out[i*8+2], blue_out[i*8+1], blue_out[i*8]};
 			$display("%d,%d,%d;", output_red, output_green, output_blue);
 		end
+		
+		$display("The current simulation time is: %d ", $time);
+		
+		#100;
 	
+		$display("The current simulation time is: %d ", $time);
 	
 		#(ClkPeriod);
 	
