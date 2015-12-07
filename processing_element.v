@@ -163,12 +163,12 @@ begin
 	        distance <= 18'b00000000;
 
 	        // map 1D vector to 2D vector
-	        for(i = 0; i < num_pixels * 8; i=i+8)
-	        begin
-	        	red[0] <= {red_in[i+7], red_in[i+6], red_in[i+5], red_in[i+4], red_in[i+3], red_in[i+2], red_in[i+1], red_in[i]};
-	        	green[0] <= {green_in[i+7], green_in[i+6], green_in[i+5], green_in[i+4], green_in[i+3],  green_in[i+2], green_in[i+1], green_in[i]};
-	        	blue[0] <= {blue_in[i+7], blue_in[i+6], blue_in[i+5], blue_in[i+4], blue_in[i+3],  blue_in[i+2], blue_in[i+1], blue_in[i]};
-	        end
+	        // for(i = 0; i < num_pixels * 8; i=i+8)
+	        // begin
+	        // 	red[0] <= {red_in[i+7], red_in[i+6], red_in[i+5], red_in[i+4], red_in[i+3], red_in[i+2], red_in[i+1], red_in[i]};
+	        // 	green[0] <= {green_in[i+7], green_in[i+6], green_in[i+5], green_in[i+4], green_in[i+3],  green_in[i+2], green_in[i+1], green_in[i]};
+	        // 	blue[0] <= {blue_in[i+7], blue_in[i+6], blue_in[i+5], blue_in[i+4], blue_in[i+3],  blue_in[i+2], blue_in[i+1], blue_in[i]};
+	        // end
 	      end
 	    BG_REPLACE: 
 	      begin
@@ -178,61 +178,111 @@ begin
 	        	state <= BG_REPLACE;
 	        end
 
+	        temp_r <= {red_in[counter*8+7], red_in[counter*8+6], red_in[counter*8+5], red_in[counter*8+4], red_in[counter*8+3], red_in[counter*8+2], red_in[counter*8+1], red_in[counter*8]};
+	        temp_g <= {green_in[counter*8+7], green_in[counter*8+6], red_in[counter*8+5], green_in[counter*8+4], green_in[counter*8+3], green_in[counter*8+2], green_in[counter*8+1], green_in[counter*8]};
+	        temp_b <= {blue_in[counter*8+7], blue_in[counter*8+6], blue_in[counter*8+5], blue_in[counter*8+4], blue_in[counter*8+3], blue_in[counter*8+2], blue_in[counter*8+1], blue_in[counter*8]};
+
 	        // calculate distance squared from expected RGB (to avoid square root operation)
-	        distance <= (red_exp - red[counter]) * (red_exp - red[counter]);
-	        distance <= distance + ((green_exp - green[counter]) * (green_exp - green[counter]));
-	        distance <= distance + ((blue_exp - blue[counter]) * (blue_exp - blue[counter]));
+	        distance <= (red_exp - temp_r) * (red_exp - temp_r);
+	        distance <= distance + ((green_exp - temp_g) * (green_exp - temp_g));
+	        distance <= distance + ((blue_exp - temp_b) * (blue_exp - temp_b));
 	        
 	        // compare to threshold
 	        if(distance > threshold)begin // if true, foreground --> same value
-	        	red[0] <= red[0];
-				green[0] <= green[0];
-				blue[0] <= blue[0];
+	        	red_out[counter*8] <= temp_r[0]; // temp_r is holding red_in
+	        	red_out[counter*8+1] <= temp_r[1];
+	        	red_out[counter*8+2] <= temp_r[2];
+	        	red_out[counter*8+3] <= temp_r[3];
+	        	red_out[counter*8+4] <= temp_r[4];
+	        	red_out[counter*8+5] <= temp_r[5];
+	        	red_out[counter*8+6] <= temp_r[6];
+	        	red_out[counter*8+7] <= temp_r[7];
+
+	        	green_out[counter*8] <= temp_g[0];
+	        	green_out[counter*8+1] <= temp_g[1];
+	        	green_out[counter*8+2] <= temp_g[2];
+	        	green_out[counter*8+3] <= temp_g[3];
+	        	green_out[counter*8+4] <= temp_g[4];
+	        	green_out[counter*8+5] <= temp_g[5];
+	        	green_out[counter*8+6] <= temp_g[6];
+	        	green_out[counter*8+7] <= temp_g[7];
+
+	        	blue_out[counter*8] <= temp_b[0];
+	        	blue_out[counter*8+1] <= temp_b[1];
+	        	blue_out[counter*8+2] <= temp_b[2];
+	        	blue_out[counter*8+3] <= temp_b[3];
+	        	blue_out[counter*8+4] <= temp_b[4];
+	        	blue_out[counter*8+5] <= temp_b[5];
+	        	blue_out[counter*8+6] <= temp_b[6];
+	        	blue_out[counter*8+7] <= temp_b[7];
 			end
 	        else begin
-	        	red[0] <= desired_bg_r;
-				green[0] <= desired_bg_g;
-				blue[0] <= desired_bg_b;
+	        	red_out[counter*8] <= desired_bg_r[0];
+	        	red_out[counter*8+1] <= desired_bg_r[1];
+	        	red_out[counter*8+2] <= desired_bg_r[2];
+	        	red_out[counter*8+3] <= desired_bg_r[3];
+	        	red_out[counter*8+4] <= desired_bg_r[4];
+	        	red_out[counter*8+5] <= desired_bg_r[5];
+	        	red_out[counter*8+6] <= desired_bg_r[6];
+	        	red_out[counter*8+7] <= desired_bg_r[7];
+
+	        	green_out[counter*8] <= desired_bg_g[0];
+	        	green_out[counter*8+1] <= desired_bg_g[1];
+	        	green_out[counter*8+2] <= desired_bg_g[2];
+	        	green_out[counter*8+3] <= desired_bg_g[3];
+	        	green_out[counter*8+4] <= desired_bg_g[4];
+	        	green_out[counter*8+5] <= desired_bg_g[5];
+	        	green_out[counter*8+6] <= desired_bg_g[6];
+	        	green_out[counter*8+7] <= desired_bg_g[7];
+
+	        	blue_out[counter*8] <= desired_bg_b[0];
+	        	blue_out[counter*8+1] <= desired_bg_b[1];
+	        	blue_out[counter*8+2] <= desired_bg_b[2];
+	        	blue_out[counter*8+3] <= desired_bg_b[3];
+	        	blue_out[counter*8+4] <= desired_bg_b[4];
+	        	blue_out[counter*8+5] <= desired_bg_b[5];
+	        	blue_out[counter*8+6] <= desired_bg_b[6];
+	        	blue_out[counter*8+7] <= desired_bg_b[7];
 	        end
 	        counter <= counter + 1;
 	      end
 	    BG_ALMOST_DONE: // format as 1D array to return
 	      begin
 			state <= BG_DONE;
-	      	for(index = 0; index < num_pixels; index=index+1)
-	        begin
-	        	temp_r = red[0];
-	        	red_out[0] = temp_r[0];
-	        	red_out[1] = temp_r[1];
-	        	red_out[2] = temp_r[2];
-	        	red_out[3] = temp_r[3];
-	        	red_out[4] = temp_r[4];
-	        	red_out[5] = temp_r[5];
-	        	red_out[6] = temp_r[6];
-	        	red_out[7] = temp_r[7];
+	      	// for(index = 0; index < num_pixels; index=index+1)
+	       //  begin
+	       //  	temp_r = red[0];
+	       //  	red_out[0] = temp_r[0];
+	       //  	red_out[1] = temp_r[1];
+	       //  	red_out[2] = temp_r[2];
+	       //  	red_out[3] = temp_r[3];
+	       //  	red_out[4] = temp_r[4];
+	       //  	red_out[5] = temp_r[5];
+	       //  	red_out[6] = temp_r[6];
+	       //  	red_out[7] = temp_r[7];
 
-	        	temp_g = green[0];
-	        	green_out[0] = temp_g[0];
-	        	green_out[1] = temp_g[1];
-	        	green_out[2] = temp_g[2];
-	        	green_out[3] = temp_g[3];
-	        	green_out[4] = temp_g[4];
-	        	green_out[5] = temp_g[5];
-	        	green_out[6] = temp_g[6];
-	        	green_out[7] = temp_g[7];
+	       //  	temp_g = green[0];
+	       //  	green_out[0] = temp_g[0];
+	       //  	green_out[1] = temp_g[1];
+	       //  	green_out[2] = temp_g[2];
+	       //  	green_out[3] = temp_g[3];
+	       //  	green_out[4] = temp_g[4];
+	       //  	green_out[5] = temp_g[5];
+	       //  	green_out[6] = temp_g[6];
+	       //  	green_out[7] = temp_g[7];
 
-	        	temp_b = blue[0];
-	        	blue_out[0] = temp_b[0];
-	        	blue_out[1] = temp_b[1];
-	        	blue_out[2] = temp_b[2];
-	        	blue_out[3] = temp_b[3];
-	        	blue_out[4] = temp_b[4];
-	        	blue_out[5] = temp_b[5];
-	        	blue_out[6] = temp_b[6];
-	        	blue_out[7] = temp_b[7];
+	       //  	temp_b = blue[0];
+	       //  	blue_out[0] = temp_b[0];
+	       //  	blue_out[1] = temp_b[1];
+	       //  	blue_out[2] = temp_b[2];
+	       //  	blue_out[3] = temp_b[3];
+	       //  	blue_out[4] = temp_b[4];
+	       //  	blue_out[5] = temp_b[5];
+	       //  	blue_out[6] = temp_b[6];
+	       //  	blue_out[7] = temp_b[7];
 
-	        	i = i+8;
-	        end
+	       //  	i = i+8;
+	       //  end
 	      end
 	    BG_DONE:
 	      begin  
