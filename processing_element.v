@@ -1,7 +1,7 @@
 module pe(Clk, Ack, Reset, red_exp, green_exp, blue_exp, threshold, desired_bg, Start_Sum, Start_BgRemoval,
 	red_in, green_in, blue_in, red_out, green_out, blue_out,
-	Qi, Qbgi, Qbg, Qbgd, Qbad, Qsi, Qs, Qsd);
-	
+	Qi, Qbgi, Qbg, Qbgd, Qbad, Qsi, Qs, Qsd, red_sum, green_sum, blue_sum);
+
 parameter num_pixels = 1; // number of pixels that each processing element analyzes
 
 // BG REMOVAL VARIABLES
@@ -23,6 +23,10 @@ output [8*num_pixels:0] red_out; // array to hold outgoing pixel red values, 2D 
 output [8*num_pixels:0] green_out;
 output [8*num_pixels:0] blue_out;
 
+output [8*num_pixels:0] red_sum;
+output [8*num_pixels:0] green_sum;
+output [8*num_pixels:0] blue_sum;
+
 reg [8*num_pixels:0] red_out; // array to hold outgoing pixel red values, 2D array mapped to 1D
 reg [8*num_pixels:0] green_out;
 reg [8*num_pixels:0] blue_out;
@@ -35,6 +39,7 @@ reg [num_pixels:0] counter = 0;
 reg [8*num_pixels:0] red_sum;
 reg [8*num_pixels:0] green_sum;
 reg [8*num_pixels:0] blue_sum;
+ 
 //reg [8*num_pixels:0] index;
 
 integer i;	//For for loop
@@ -54,8 +59,8 @@ BG_REPLACE = 8'b00100000,
 BG_ALMOST_DONE = 8'b01000000,
 BG_DONE = 8'b10000000;
 
-reg [3:0] state;
-assign {Qi, Qbgi, Qbg, Qbgd, Qsi, Qs, Qsd} = state;
+reg [7:0] state;
+assign {Qbgd, Qbad, Qbg, Qbgi, Qsd, Qs, Qsi, Qi} = state;
 
 always @(posedge Clk, posedge Start_Sum)
 begin
