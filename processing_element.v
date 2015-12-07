@@ -2,7 +2,7 @@ module pe(Clk, Ack, Reset, red_exp, green_exp, blue_exp, threshold, desired_bg, 
 	red_in, green_in, blue_in, red_out, green_out, blue_out,
 	Qi, Qbgi, Qbg, Qbgd, Qbad, Qsi, Qs, Qsd);
 	
-parameter num_pixels = 1;
+parameter num_pixels = 1; // number of pixels that each processing element analyzes
 
 // BG REMOVAL VARIABLES
 input [8:0] red_exp;
@@ -41,7 +41,7 @@ integer i;	//For for loop
 integer index;
 
 reg [7:0] temp;
-reg [18:0] distance;
+reg [17:0] distance; // 256*256*3 is maximum possible
 
 // STATE VARIABLES
 localparam
@@ -69,7 +69,29 @@ end
 
 always @(posedge Clk, posedge Reset) 
 begin
+	if(Reset)
+	begin
+        state <= IDLE;
+
+        // set all values to XXX to avoid recirculating mux from keeping track of unecessary values
+        red_out <= 8'bXXXXXXXX; // change based on num_pixels (should be of size 8 * num_pixels)
+        green_out <= 8'bXXXXXXXX; // change based on num_pixels
+        blue_out <= 8'bXXXXXXXX; // change based on num_pixels
+
+        counter <= 1'bX; // 8 * num_pixels
+
+        red_sum <= 8'bXXXXXXXX; // change based on num_pixels (should be of size 8 * num_pixels)
+        green_sum <= 8'bXXXXXXXX; // change based on num_pixels
+        blue_sum <= 8'bXXXXXXXX; // change based on num_pixels
+
+		temp <= 8'bXXXXXXXX;
+		distance <= 18'bXXXXXXXXXXXXXXXXXX;
+	end
 	case (state)
+		IDLE:
+		begin
+			state <= IDLE;
+		end
 	    SUM_INIT: 
 	      begin
 	        state <= SUM_ADD;
@@ -80,7 +102,7 @@ begin
 	        index <= 0;
 
 	        // map 1D vector to 2D vector
-	        for(i = 0; i < num_pixels; i=i+8)
+	        for(i = 0; i < num_pixels * 8; i=i+8)
 	        begin
 	        	red[index] <= {red_in[i+7], red_in[i+6], red_in[i+5], red_in[i+4], red_in[i+3], red_in[i+1], red_in[i]};
 	        	green[index] <= {green_in[i+7], green_in[i+6], green_in[i+5], green_in[i+4], green_in[i+3], green_in[i+1], green_in[i]};
@@ -102,6 +124,12 @@ begin
 	        counter <= counter + 1;
 
 	      end
+		SUM_DONE:
+		begin  
+		 // state transitions in the control unit
+		 if (Ack)
+		   state <= IDLE;
+		end    
 	    BG_INIT: 
 	      begin
 	        state <= BG_REPLACE;
@@ -113,7 +141,7 @@ begin
 	        index = 0;
 
 	        // map 1D vector to 2D vector
-	        for(i = 0; i < num_pixels; i=i+8)
+	        for(i = 0; i < num_pixels * 8; i=i+8)
 	        begin
 				red[index] <= {red_in[i+7], red_in[i+6], red_in[i+5], red_in[i+4], red_in[i+3], red_in[i+1], red_in[i]};
 	        	green[index] <= {green_in[i+7], green_in[i+6], green_in[i+5], green_in[i+4], green_in[i+3], green_in[i+1], green_in[i]};
@@ -145,7 +173,7 @@ begin
 	    BG_ALMOST_DONE: // format as 1D array to return
 	      begin
 			state <= BG_DONE;
-	      	for(index = 0; index < num_pixels; index=index+8)
+	      	for(index = 0; index < num_pixels; index=index+1)
 	        begin
 	        	temp <= red[index];
 	        	red_out[i] = temp[0];
