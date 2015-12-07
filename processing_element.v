@@ -96,6 +96,20 @@ begin
 		IDLE:
 		begin
 			state <= IDLE;
+
+	        // set all values to XXX to avoid recirculating mux from keeping track of unecessary values
+	        red_out <= 8'bXXXXXXXX; // change based on num_pixels (should be of size 8 * num_pixels)
+	        green_out <= 8'bXXXXXXXX; // change based on num_pixels
+	        blue_out <= 8'bXXXXXXXX; // change based on num_pixels
+
+	        counter <= 1'bX; // 8 * num_pixels
+
+	        red_sum <= 8'bXXXXXXXX; // change based on num_pixels (should be of size 8 * num_pixels)
+	        green_sum <= 8'bXXXXXXXX; // change based on num_pixels
+	        blue_sum <= 8'bXXXXXXXX; // change based on num_pixels
+
+			temp <= 8'bXXXXXXXX;
+			distance <= 18'bXXXXXXXXXXXXXXXXXX;
 		end
 	    SUM_INIT: 
 	      begin
@@ -105,13 +119,14 @@ begin
 	        green_sum <= 0;
 	        blue_sum <= 0;
 	        index <= 0;
+	        i <= 0;
 
 	        // map 1D vector to 2D vector
 	        for(i = 0; i < num_pixels * 8; i=i+8)
 	        begin
-	        	red[index] <= {red_in[i+7], red_in[i+6], red_in[i+5], red_in[i+4], red_in[i+3], red_in[i+1], red_in[i]};
-	        	green[index] <= {green_in[i+7], green_in[i+6], green_in[i+5], green_in[i+4], green_in[i+3], green_in[i+1], green_in[i]};
-	        	blue[index] <= {blue_in[i+7], blue_in[i+6], blue_in[i+5], blue_in[i+4], blue_in[i+3], blue_in[i+1], blue_in[i]};
+	        	red[index] <= 9'd61; //{red_in[i+7], red_in[i+6], red_in[i+5], red_in[i+4], red_in[i+3], red_in[i+1], red_in[i]};
+	        	green[index] <= 9'd133; //{green_in[i+7], green_in[i+6], green_in[i+5], green_in[i+4], green_in[i+3], green_in[i+1], green_in[i]};
+	        	blue[index] <= 9'd198; //{blue_in[i+7], blue_in[i+6], blue_in[i+5], blue_in[i+4], blue_in[i+3], blue_in[i+1], blue_in[i]};
 	        	index = index + 1;
 	        end
 	      end
@@ -139,19 +154,16 @@ begin
 	      begin
 	        state <= BG_REPLACE;
 	        counter <= 0;
-	        red_sum <= 0;
-	        green_sum <= 0;
-	        blue_sum <= 0;
-	        i = 0;
-	        index = 0;
+	        i <= 0;
+	        index <= 0;
+	        distance <= 18'b00000000;
 
 	        // map 1D vector to 2D vector
 	        for(i = 0; i < num_pixels * 8; i=i+8)
 	        begin
-				red[index] <= {red_in[i+7], red_in[i+6], red_in[i+5], red_in[i+4], red_in[i+3], red_in[i+1], red_in[i]};
-	        	green[index] <= {green_in[i+7], green_in[i+6], green_in[i+5], green_in[i+4], green_in[i+3], green_in[i+1], green_in[i]};
-	        	blue[index] <= {blue_in[i+7], blue_in[i+6], blue_in[i+5], blue_in[i+4], blue_in[i+3], blue_in[i+1], blue_in[i]};
-	        	index = index + 1;
+				red[index] <= 9'd61; //{red_in[i+7], red_in[i+6], red_in[i+5], red_in[i+4], red_in[i+3], red_in[i+1], red_in[i]};
+	        	green[index] <= 9'd133; //{green_in[i+7], green_in[i+6], green_in[i+5], green_in[i+4], green_in[i+3], green_in[i+1], green_in[i]};
+	        	blue[index] <= 9'd198; //{blue_in[i+7], blue_in[i+6], blue_in[i+5], blue_in[i+4], blue_in[i+3], blue_in[i+1], blue_in[i]};
 	        end
 	      end
 	    BG_REPLACE: 
