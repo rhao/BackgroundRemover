@@ -81,7 +81,7 @@ module pe_testbench();
 		#(ClkPeriod);
 		Start_BgRemoval <= 0;
 		
-		#50;
+		#30;
 
 		$display("Pixels after background replacement are: ");
 		for(i = 0; i < 25; i = i + 1) begin
