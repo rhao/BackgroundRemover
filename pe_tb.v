@@ -91,6 +91,13 @@ module pe_testbench();
 		green_exp <= green_sum / num_processors / num_pixels;
 		blue_exp <= blue_sum / num_processors / num_pixels;
 
+		
+
+// red_exp: 96.75
+// green_exp: 99.75
+// blue_exp: 148.5
+
+
 		desired_bg_r <= 8'd106; // new background rgb (light green)
 		desired_bg_g <= 8'd168;
 		desired_bg_b <= 8'd79;

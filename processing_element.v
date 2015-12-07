@@ -165,14 +165,7 @@ begin
 	        	blue_out[counter*8+7] <= temp_b[7];
 			end
 	        else begin
-	        	red_out[counter*8] <= desired_bg_r[0];
-	        	red_out[counter*8+1] <= desired_bg_r[1];
-	        	red_out[counter*8+2] <= desired_bg_r[2];
-	        	red_out[counter*8+3] <= desired_bg_r[3];
-	        	red_out[counter*8+4] <= desired_bg_r[4];
-	        	red_out[counter*8+5] <= desired_bg_r[5];
-	        	red_out[counter*8+6] <= desired_bg_r[6];
-	        	red_out[counter*8+7] <= desired_bg_r[7];
+	        	{red_out[counter*8],red_out[counter*8+1],red_out[counter*8+2],red_out[counter*8+3],red_out[counter*8+4],red_out[counter*8+5],red_out[counter*8+6],red_out[counter*8+7]} <= desired_bg_r;
 
 	        	green_out[counter*8] <= desired_bg_g[0];
 	        	green_out[counter*8+1] <= desired_bg_g[1];
@@ -191,6 +184,32 @@ begin
 	        	blue_out[counter*8+5] <= desired_bg_b[5];
 	        	blue_out[counter*8+6] <= desired_bg_b[6];
 	        	blue_out[counter*8+7] <= desired_bg_b[7];
+	        	// red_out[counter*8] <= desired_bg_r[0];
+	        	// red_out[counter*8+1] <= desired_bg_r[1];
+	        	// red_out[counter*8+2] <= desired_bg_r[2];
+	        	// red_out[counter*8+3] <= desired_bg_r[3];
+	        	// red_out[counter*8+4] <= desired_bg_r[4];
+	        	// red_out[counter*8+5] <= desired_bg_r[5];
+	        	// red_out[counter*8+6] <= desired_bg_r[6];
+	        	// red_out[counter*8+7] <= desired_bg_r[7];
+
+	        	// green_out[counter*8] <= desired_bg_g[0];
+	        	// green_out[counter*8+1] <= desired_bg_g[1];
+	        	// green_out[counter*8+2] <= desired_bg_g[2];
+	        	// green_out[counter*8+3] <= desired_bg_g[3];
+	        	// green_out[counter*8+4] <= desired_bg_g[4];
+	        	// green_out[counter*8+5] <= desired_bg_g[5];
+	        	// green_out[counter*8+6] <= desired_bg_g[6];
+	        	// green_out[counter*8+7] <= desired_bg_g[7];
+
+	        	// blue_out[counter*8] <= desired_bg_b[0];
+	        	// blue_out[counter*8+1] <= desired_bg_b[1];
+	        	// blue_out[counter*8+2] <= desired_bg_b[2];
+	        	// blue_out[counter*8+3] <= desired_bg_b[3];
+	        	// blue_out[counter*8+4] <= desired_bg_b[4];
+	        	// blue_out[counter*8+5] <= desired_bg_b[5];
+	        	// blue_out[counter*8+6] <= desired_bg_b[6];
+	        	// blue_out[counter*8+7] <= desired_bg_b[7];
 	        end
 	        counter <= counter + 1;
 	      end
