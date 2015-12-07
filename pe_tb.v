@@ -17,6 +17,7 @@ module pe_testbench();
 	reg [7:0] threshold;
 	reg [7:0] desired_bg_r, desired_bg_g, desired_bg_b;
 	reg Start_Sum, Start_BgRemoval, Reset, Ack;
+	reg [7:0] output_red, output_green, output_blue;
 
 	wire Qi, Qbgi, Qbg, Qbgd, Qsi, Qs, Qsd;
 
@@ -91,8 +92,11 @@ module pe_testbench();
 		end
 
 		$display("Pixels after background replacement are: ");
-		for(i = 0; i < 25; i = i + 1) begin
-			$display("%d, %d, %d; ", red_out, green_out, blue_out);
+		for(i = 0; i < 1; i = i + 1) begin
+			output_red = {red_out[i*8+7], red_out[i*8+6], red_out[i*8+5], red_out[i*8+4], red_out[i*8+3], red_out[i*8+2], red_out[i*8+1], red_out[i*8]};
+			output_green = {green_out[i*8+7], green_out[i*8+6], green_out[i*8+5], green_out[i*8+4], green_out[i*8+3], green_out[i*8+2], green_out[i*8+1], green_out[i*8]};
+			output_blue = {blue_out[i*8+7], blue_out[i*8+6], blue_out[i*8+5], blue_out[i*8+4], blue_out[i*8+3], blue_out[i*8+2], blue_out[i*8+1], blue_out[i*8]};
+			$display("%d, %d, %d; ", output_red, output_green, output_blue);
 		end
 	
 	
