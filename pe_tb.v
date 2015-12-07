@@ -11,27 +11,27 @@ module pe_testbench();
 	parameter num_pixels = 1;
 
 	// BG REMOVAL VARIABLES
-	reg [8:0] red_exp;
-	reg [8:0] green_exp;
-	reg [8:0] blue_exp;
-	reg [8:0] threshold;
-	reg [8:0] desired_bg_r, desired_bg_g, desired_bg_b;
+	reg [7:0] red_exp;
+	reg [7:0] green_exp;
+	reg [7:0] blue_exp;
+	reg [7:0] threshold;
+	reg [7:0] desired_bg_r, desired_bg_g, desired_bg_b;
 	reg Start_Sum, Start_BgRemoval, Reset, Ack;
 
 	wire Qi, Qbgi, Qbg, Qbgd, Qbad, Qsi, Qs, Qsd;
 
 	// INCOMING / OUTGOING PIXEL VALUE VARIABLES
-	reg [8*num_pixels:0] red_in; // array to hold incoming pixel red values, 2D array mapped to 1D
-	reg [8*num_pixels:0] green_in;
-	reg [8*num_pixels:0] blue_in;
+	reg [8*num_pixels-1:0] red_in; // array to hold incoming pixel red values, 2D array mapped to 1D
+	reg [8*num_pixels-1:0] green_in;
+	reg [8*num_pixels-1:0] blue_in;
 
-	wire [8*num_pixels:0] red_out; // array to hold outgoing pixel red values, 2D array mapped to 1D
-	wire [8*num_pixels:0] green_out;
-	wire [8*num_pixels:0] blue_out;
+	wire [8*num_pixels-1:0] red_out; // array to hold outgoing pixel red values, 2D array mapped to 1D
+	wire [8*num_pixels-1:0] green_out;
+	wire [8*num_pixels-1:0] blue_out;
 	
-	wire [8*num_pixels:0] red_sum;
-	wire [8*num_pixels:0] green_sum;
-	wire [8*num_pixels:0] blue_sum;
+	wire [8*num_pixels-1:0] red_sum;
+	wire [8*num_pixels-1:0] green_sum;
+	wire [8*num_pixels-1:0] blue_sum;
 	
 	integer i;
 
