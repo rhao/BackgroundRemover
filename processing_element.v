@@ -1,8 +1,8 @@
-module pe(Clk, Ack, red_exp, green_exp, blue_exp, threshold, desired_bg, Start_Sum, Start_BgRemoval,
-	red_in, green_in, blue_in, red_out, green_out, blue_out
+module pe(Clk, Ack, Reset, red_exp, green_exp, blue_exp, threshold, desired_bg, Start_Sum, Start_BgRemoval,
+	red_in, green_in, blue_in, red_out, green_out, blue_out,
 	Qi, Qbgi, Qbg, Qbgd, Qbad, Qsi, Qs, Qsd);
-
-reg num_pixels = 1; // num pixels this processing element is responsible for
+	
+parameter num_pixels = 1;
 
 // BG REMOVAL VARIABLES
 input [8:0] red_exp;
@@ -10,7 +10,7 @@ input [8:0] green_exp;
 input [8:0] blue_exp;
 input threshold;
 input [8:0] desired_bg;
-input Start_Sum, Start_BgRemoval, Clk, Ack;
+input Start_Sum, Start_BgRemoval, Clk, Reset, Ack;
 
 output Qi, Qbgi, Qbg, Qbgd, Qbad, Qsi, Qs, Qsd;
 
@@ -19,9 +19,11 @@ input [8*num_pixels:0] red_in; // array to hold incoming pixel red values, 2D ar
 input [8*num_pixels:0] green_in;
 input [8*num_pixels:0] blue_in;
 
+/*
 reg [8*num_pixels:0] red_in; // array to hold incoming pixel red values, 2D array mapped to 1D
 reg [8*num_pixels:0] green_in;
 reg [8*num_pixels:0] blue_in;
+*/
 
 output [8*num_pixels:0] red_out; // array to hold outgoing pixel red values, 2D array mapped to 1D
 output [8*num_pixels:0] green_out;
@@ -39,21 +41,26 @@ reg [num_pixels:0] counter = 0;
 reg [8*num_pixels:0] red_sum;
 reg [8*num_pixels:0] green_sum;
 reg [8*num_pixels:0] blue_sum;
+//reg [8*num_pixels:0] index;
 
+integer i;	//For for loop
+integer index;
+
+reg [18:0] distance;
 
 // STATE VARIABLES
 localparam
 IDLE = 8'b00000001, // idle, do nothing
-SUM_INIT = 8'b00000010, // sum initial
-SUM_ADD = 8'b00000100, // compute sums of rgb values - return to this state until all have been processed
-SUM_DONE = 8'b00001000, // done computing rgb sum
+SUM_INIT = 8'b00000010, // sum
+SUM_ADD = 8'b00000100,
+SUM_DONE = 8'b00001000,
 BG_INIT = 8'b00010000, // background subtract and replace
 BG_REPLACE = 8'b00100000,
-BG_ALMOST_DONE = 8'b01000000, // convert rgb 2D arrays to 1D to return
+BG_ALMOST_DONE = 8'b01000000,
 BG_DONE = 8'b10000000;
 
-wire [3:0] state;
-assign {Qi, Qbgi, Qbg, Qbgd, Qbad, Qsi, Qs, Qsd} = state;
+reg [3:0] state;
+assign {Qi, Qbgi, Qbg, Qbgd, Qsi, Qs, Qsd} = state;
 
 always @(posedge Clk, posedge Start_Sum)
 begin
@@ -66,7 +73,7 @@ begin
 end 
 
 always @(posedge Clk, posedge Reset) 
-begin  :
+begin
 	case (state)
 	    SUM_INIT: 
 	      begin
@@ -75,7 +82,7 @@ begin  :
 	        red_sum <= 0;
 	        green_sum <= 0;
 	        blue_sum <= 0;
-	        reg index = 0;
+	        index <= 0;
 
 	        // map 1D vector to 2D vector
 	        for(i = 0; i < num_pixels; i=i+8)
@@ -83,7 +90,7 @@ begin  :
 	        	red[index] <= red_in[i:i+7];
 	        	green[index] <= green_in[i:i+7];
 	        	blue[index] <= blue_in[i:i+7];
-	        	index++;
+	        	index = index + 1;
 	        end
 	      end
 	    SUM_ADD: 
@@ -114,7 +121,7 @@ begin  :
 	        	red[index] <= red_in[i:i+7];
 	        	green[index] <= green_in[i:i+7];
 	        	blue[index] <= blue_in[i:i+7];
-	        	index++;
+	        	index = index+1;
 	        end
 	      end
 	    BG_REPLACE: 
@@ -126,12 +133,12 @@ begin  :
 	        end
 
 	        // calculate distance squared from expected RGB (to avoid square root operation)
-	        reg dist <= (red_exp - red[counter]) * (red_exp - red[counter]);
-	        dist <= dist + ((green_exp - green[counter]) * (green_exp - green[counter]));
-	        dist <= dist + ((blue_exp - blue[counter]) * (blue_exp - blue[counter]));
+	        distance <= (red_exp - red[counter]) * (red_exp - red[counter]);
+	        distance <= distance + ((green_exp - green[counter]) * (green_exp - green[counter]));
+	        distance <= distance + ((blue_exp - blue[counter]) * (blue_exp - blue[counter]));
 	        
 	        // compare to threshold
-	        if(dist > threshold) // if true, foreground --> same value
+	        if(distance > threshold) // if true, foreground --> same value
 	        	red[counter] <= red[counter];
 	        else begin
 	        	red[counter] <= desired_bg;
@@ -139,8 +146,8 @@ begin  :
 	        counter <= counter + 1;
 	      end
 	    BG_ALMOST_DONE: // format as 1D array to return
-	      state <= BG_DONE;
 	      begin
+			state <= BG_DONE;
 	      	for(index = 0; index < num_pixels; index=index+8)
 	        begin
 	        	red_out[i:i+7] <= red[index];
