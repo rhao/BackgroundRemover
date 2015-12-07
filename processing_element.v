@@ -128,13 +128,13 @@ begin
 	        i <= 0;
 
 	        // map 1D vector to 2D vector
-	        for(i = 0; i < num_pixels * 8; i=i+8)
-	        begin
-	        	red[index +:8] <= {red_in[i+7], red_in[i+6], red_in[i+5], red_in[i+4], red_in[i+3], red_in[i+2], red_in[i+1], red_in[i]};
-	        	green[index +:8] <= {green_in[i+7], green_in[i+6], green_in[i+5], green_in[i+4], green_in[i+3],  green_in[i+2], green_in[i+1], green_in[i]};
-	        	blue[index +:8] <= {blue_in[i+7], blue_in[i+6], blue_in[i+5], blue_in[i+4], blue_in[i+3],  blue_in[i+2], blue_in[i+1], blue_in[i]};
-	        	index <= index + 1;
-	        end
+	        // for(i = 0; i < num_pixels * 8; i=i+8)
+	        // begin
+	        // 	red[index +:8] <= {red_in[i+7], red_in[i+6], red_in[i+5], red_in[i+4], red_in[i+3], red_in[i+2], red_in[i+1], red_in[i]};
+	        // 	green[index +:8] <= {green_in[i+7], green_in[i+6], green_in[i+5], green_in[i+4], green_in[i+3],  green_in[i+2], green_in[i+1], green_in[i]};
+	        // 	blue[index +:8] <= {blue_in[i+7], blue_in[i+6], blue_in[i+5], blue_in[i+4], blue_in[i+3],  blue_in[i+2], blue_in[i+1], blue_in[i]};
+	        // 	index <= index + 1;
+	        // end
 	      end
 	    SUM_ADD: 
 	      begin
@@ -143,12 +143,10 @@ begin
 	        else begin
 	        	state <= SUM_ADD;
 	        end
-
-	        red_sum <= red_sum + red[counter];
-	        green_sum <= green_sum + green[counter];
-	        blue_sum <= blue_sum + blue[counter];
+	        red_sum <= red_sum + {red_in[counter*8+7], red_in[counter*8+6], red_in[counter*8+5], red_in[counter*8+4], red_in[counter*8+3], red_in[counter*8+2], red_in[counter*8+1], red_in[counter*8]};
+	        green_sum <= green_sum + {green_in[counter*8+7], green_in[counter*8+6], red_in[counter*8+5], green_in[counter*8+4], green_in[counter*8+3], green_in[counter*8+2], green_in[counter*8+1], green_in[counter*8]};
+	        blue_sum <= blue_sum + {blue_in[counter*8+7], blue_in[counter*8+6], blue_in[counter*8+5], blue_in[counter*8+4], blue_in[counter*8+3], blue_in[counter*8+2], blue_in[counter*8+1], blue_in[counter*8]};
 	        counter <= counter + 1;
-
 	      end
 		SUM_DONE:
 		begin  
