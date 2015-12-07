@@ -53,9 +53,9 @@ module pe_testbench();
 		Reset = 0;
 		#(ClkPeriod);
 		
-		red_in <= {61,204};
-		green_in <= {133,0};
-		blue_in <= {198,0};
+		red_in <= {8'd61,8'd61,8'd61,8'd204};
+		green_in <= {8'd133,8'd133,8'd133,8'd0};
+		blue_in <= {8'd198,8'd198,8'd198,8'd0};
 		Start_Sum <= 1;
 		Start_BgRemoval <= 0;
 		Reset <= 0;
@@ -74,18 +74,18 @@ module pe_testbench();
 		
 		// TEST: blue, blue, blue, red
 		// set values for background removal
-		red_in <= {61,61,61,204};
-		green_in <= {133,133,133,0};
-		blue_in <= {198,198,198,0};
+		red_in <= {8'd61,8'd61,8'd61,8'd204};
+		green_in <= {8'd133,8'd133,8'd133,8'd0};
+		blue_in <= {8'd198,8'd198,8'd198,8'd0};
 		threshold <= 60; // threshold value
 
 		red_exp <= red_sum / num_processors; // TODO: red_sum1 + red_sum2 for the different processors
 		green_exp <= green_sum / num_processors;
 		blue_exp <= blue_sum / num_processors;
 
-		desired_bg_r <= 106; // new background rgb (light green)
-		desired_bg_g <= 168;
-		desired_bg_b <= 79;
+		desired_bg_r <= 8'd106; // new background rgb (light green)
+		desired_bg_g <= 8'd168;
+		desired_bg_b <= 8'd79;
 
 		Start_BgRemoval <= 1; // signal bg removal to start
 		#(ClkPeriod);
