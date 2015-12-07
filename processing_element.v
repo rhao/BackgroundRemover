@@ -47,7 +47,7 @@ reg [17:0] distance; // 256*256*3 is maximum possible
 
 // STATE VARIABLES
 localparam
-IDLE = 7'b00000001, // idle, do nothing
+IDLE = 7'b0000001, // idle, do nothing
 SUM_INIT = 7'b0000010, // sum
 SUM_ADD = 7'b0000100,
 SUM_DONE = 7'b0001000,
