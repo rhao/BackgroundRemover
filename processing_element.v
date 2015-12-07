@@ -5,40 +5,40 @@ module pe(Clk, Ack, Reset, red_exp, green_exp, blue_exp, threshold, desired_bg_r
 parameter num_pixels = 1; // number of pixels that each processing element analyzes
 
 // BG REMOVAL VARIABLES
-input [8:0] red_exp;
-input [8:0] green_exp;
-input [8:0] blue_exp;
+input [7:0] red_exp;
+input [7:0] green_exp;
+input [7:0] blue_exp;
 input threshold;
-input [8:0] desired_bg_r, desired_bg_g, desired_bg_b;
+input [7:0] desired_bg_r, desired_bg_g, desired_bg_b;
 input Start_Sum, Start_BgRemoval, Clk, Reset, Ack;
 
 output Qi, Qbgi, Qbg, Qbgd, Qbad, Qsi, Qs, Qsd;
 
 // INCOMING / OUTGOING PIXEL VALUE VARIABLES
-input [8*num_pixels:0] red_in; // array to hold incoming pixel red values, 2D array mapped to 1D
-input [8*num_pixels:0] green_in;
-input [8*num_pixels:0] blue_in;
+input [8*num_pixels-1:0] red_in; // array to hold incoming pixel red values, 2D array mapped to 1D
+input [8*num_pixels-1:0] green_in;
+input [8*num_pixels-1:0] blue_in;
 
-output [8*num_pixels:0] red_out; // array to hold outgoing pixel red values, 2D array mapped to 1D
-output [8*num_pixels:0] green_out;
-output [8*num_pixels:0] blue_out;
+output [8*num_pixels-1:0] red_out; // array to hold outgoing pixel red values, 2D array mapped to 1D
+output [8*num_pixels-1:0] green_out;
+output [8*num_pixels-1:0] blue_out;
 
-output [8*num_pixels:0] red_sum;
-output [8*num_pixels:0] green_sum;
-output [8*num_pixels:0] blue_sum;
+output [8*num_pixels-1:0] red_sum;
+output [8*num_pixels-1:0] green_sum;
+output [8*num_pixels-1:0] blue_sum;
 
-reg [8*num_pixels:0] red_out; // array to hold outgoing pixel red values, 2D array mapped to 1D
-reg [8*num_pixels:0] green_out;
-reg [8*num_pixels:0] blue_out;
+reg [8*num_pixels-1:0] red_out; // array to hold outgoing pixel red values, 2D array mapped to 1D
+reg [8*num_pixels-1:0] green_out;
+reg [8*num_pixels-1:0] blue_out;
 
-reg [8:0] red[0:num_pixels]; // array to hold pixel red values - 2D version
-reg [8:0] green[0:num_pixels];
-reg [8:0] blue[0:num_pixels];
+reg [7:0] red[0:num_pixels-1]; // array to hold pixel red values - 2D version, num pixels cells of size 8 bits
+reg [7:0] green[0:num_pixels-1];
+reg [7:0] blue[0:num_pixels-1];
 
-reg [num_pixels:0] counter = 0;
-reg [8*num_pixels:0] red_sum;
-reg [8*num_pixels:0] green_sum;
-reg [8*num_pixels:0] blue_sum;
+reg [num_pixels-1:0] counter = 0;
+reg [8*num_pixels-1:0] red_sum;
+reg [8*num_pixels-1:0] green_sum;
+reg [8*num_pixels-1:0] blue_sum;
  
 //reg [8*num_pixels:0] index;
 
@@ -130,9 +130,9 @@ begin
 	        // map 1D vector to 2D vector
 	        for(i = 0; i < num_pixels * 8; i=i+8)
 	        begin
-	        	red[0] <= {red_in[i+7], red_in[i+6], red_in[i+5], red_in[i+4], red_in[i+3], red_in[i+2], red_in[i+1], red_in[i]};
-	        	green[0] <= {green_in[i+7], green_in[i+6], green_in[i+5], green_in[i+4], green_in[i+3],  green_in[i+2], green_in[i+1], green_in[i]};
-	        	blue[0] <= {blue_in[i+7], blue_in[i+6], blue_in[i+5], blue_in[i+4], blue_in[i+3],  blue_in[i+2], blue_in[i+1], blue_in[i]};
+	        	red[index +:8] <= {red_in[i+7], red_in[i+6], red_in[i+5], red_in[i+4], red_in[i+3], red_in[i+2], red_in[i+1], red_in[i]};
+	        	green[index +:8] <= {green_in[i+7], green_in[i+6], green_in[i+5], green_in[i+4], green_in[i+3],  green_in[i+2], green_in[i+1], green_in[i]};
+	        	blue[index +:8] <= {blue_in[i+7], blue_in[i+6], blue_in[i+5], blue_in[i+4], blue_in[i+3],  blue_in[i+2], blue_in[i+1], blue_in[i]};
 	        	index <= index + 1;
 	        end
 	      end
