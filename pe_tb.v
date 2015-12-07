@@ -86,10 +86,10 @@ module pe_testbench();
 			output_blue = {blue_in[i*8+7], blue_in[i*8+6], blue_in[i*8+5], blue_in[i*8+4], blue_in[i*8+3], blue_in[i*8+2], blue_in[i*8+1], blue_in[i*8]};
 			$display("%d,%d,%d;", output_red, output_green, output_blue);
 		end
-		
-		red_exp <= red_sum / num_processors; // TODO: red_sum1 + red_sum2 for the different processors
-		green_exp <= green_sum / num_processors;
-		blue_exp <= blue_sum / num_processors;
+
+		red_exp <= red_sum / num_processors / num_pixels; // TODO: red_sum1 + red_sum2 for the different processors
+		green_exp <= green_sum / num_processors / num_pixels;
+		blue_exp <= blue_sum / num_processors / num_pixels;
 
 		desired_bg_r <= 8'd106; // new background rgb (light green)
 		desired_bg_g <= 8'd168;
