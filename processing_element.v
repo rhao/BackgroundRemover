@@ -8,7 +8,7 @@ parameter num_pixels = 1; // number of pixels that each processing element analy
 input [7:0] red_exp;
 input [7:0] green_exp;
 input [7:0] blue_exp;
-input threshold;
+input [7:0] threshold;
 input [7:0] desired_bg_r, desired_bg_g, desired_bg_b;
 input Start_Sum, Start_BgRemoval, Clk, Reset, Ack;
 
@@ -184,14 +184,15 @@ begin
 	        distance <= distance + ((blue_exp - blue[counter]) * (blue_exp - blue[counter]));
 	        
 	        // compare to threshold
-	        if(distance > threshold) // if true, foreground --> same value
+	        if(distance > threshold)begin // if true, foreground --> same value
 	        	red[0] <= red[0];
 				green[0] <= green[0];
 				blue[0] <= blue[0];
+			end
 	        else begin
-	        	red[0] <= desired_bg;
-				green[0] <= desired_bg;
-				blue[0] <= desired_bg;
+	        	red[0] <= desired_bg_r;
+				green[0] <= desired_bg_g;
+				blue[0] <= desired_bg_b;
 	        end
 	        counter <= counter + 1;
 	      end
