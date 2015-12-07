@@ -94,7 +94,12 @@ module pe_testbench();
 		for(i = 0; i < 25; i = i + 1) begin
 			$display("%d, %d, %d; ", red_out, green_out, blue_out);
 		end
+		
+		$display("The current simulation time is: %d ", $time);
+		
+		#100;
 	
+		$display("The current simulation time is: %d ", $time);
 	
 		#(ClkPeriod);
 	
