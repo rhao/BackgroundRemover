@@ -14,11 +14,11 @@ module pe_testbench();
 	reg [8:0] red_exp;
 	reg [8:0] green_exp;
 	reg [8:0] blue_exp;
-	reg threshold;
+	reg [8:0] threshold;
 	reg [8:0] desired_bg_r, desired_bg_g, desired_bg_b;
 	reg Start_Sum, Start_BgRemoval, Reset, Ack;
 
-	//reg Qi, Qbgi, Qbg, Qbgd, Qbad, Qsi, Qs, Qsd;
+	wire Qi, Qbgi, Qbg, Qbgd, Qbad, Qsi, Qs, Qsd;
 
 	// INCOMING / OUTGOING PIXEL VALUE VARIABLES
 	reg [8*num_pixels:0] red_in; // array to hold incoming pixel red values, 2D array mapped to 1D
@@ -35,7 +35,7 @@ module pe_testbench();
 	
 	integer i;
 
-	pe processor1(Clk, Ack, Reset, red_exp, green_exp, blue_exp, threshold, desired_bg, Start_Sum, Start_BgRemoval,
+	pe processor1(Clk, Ack, Reset, red_exp, green_exp, blue_exp, threshold, desired_bg_r, desired_bg_g, desired_bg_b, Start_Sum, Start_BgRemoval,
 					red_in, green_in, blue_in, red_out, green_out, blue_out,
 					Qi, Qbgi, Qbg, Qbgd, Qbad, Qsi, Qs, Qsd, red_sum, green_sum, blue_sum);
 	
