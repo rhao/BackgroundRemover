@@ -1,6 +1,6 @@
 module pe(Clk, Ack, Reset, red_exp, green_exp, blue_exp, threshold, desired_bg_r, desired_bg_g, desired_bg_b,
 	Start_Sum, Start_BgRemoval, red_in, green_in, blue_in, red_out, green_out, blue_out,
-	Qi, Qbgi, Qbg, Qbgd, Qbad, Qsi, Qs, Qsd, red_sum, green_sum, blue_sum);
+	Qi, Qbgi, Qbg, Qbgd, Qsi, Qs, Qsd, red_sum, green_sum, blue_sum);
 
 parameter num_pixels = 1; // number of pixels that each processing element analyzes
 
@@ -12,7 +12,7 @@ input [7:0] threshold;
 input [7:0] desired_bg_r, desired_bg_g, desired_bg_b;
 input Start_Sum, Start_BgRemoval, Clk, Reset, Ack;
 
-output Qi, Qbgi, Qbg, Qbgd, Qbad, Qsi, Qs, Qsd;
+output Qi, Qbgi, Qbg, Qbgd, Qsi, Qs, Qsd;
 
 // INCOMING / OUTGOING PIXEL VALUE VARIABLES
 input [8*num_pixels-1:0] red_in; // array to hold incoming pixel red values, 2D array mapped to 1D
@@ -39,11 +39,6 @@ reg [num_pixels-1:0] counter = 0;
 reg [8*num_pixels-1:0] red_sum;
 reg [8*num_pixels-1:0] green_sum;
 reg [8*num_pixels-1:0] blue_sum;
- 
-//reg [8*num_pixels:0] index;
-
-integer i;	//For for loop
-integer index;
 
 reg [7:0] temp_r;
 reg [7:0] temp_g;
@@ -52,17 +47,16 @@ reg [17:0] distance; // 256*256*3 is maximum possible
 
 // STATE VARIABLES
 localparam
-IDLE = 8'b00000001, // idle, do nothing
-SUM_INIT = 8'b00000010, // sum
-SUM_ADD = 8'b00000100,
-SUM_DONE = 8'b00001000,
-BG_INIT = 8'b00010000, // background subtract and replace
-BG_REPLACE = 8'b00100000,
-BG_ALMOST_DONE = 8'b01000000,
-BG_DONE = 8'b10000000;
+IDLE = 7'b00000001, // idle, do nothing
+SUM_INIT = 7'b0000010, // sum
+SUM_ADD = 7'b0000100,
+SUM_DONE = 7'b0001000,
+BG_INIT = 7'b0010000, // background subtract and replace
+BG_REPLACE = 7'b0100000,
+BG_DONE = 7'b1000000;
 
-reg [7:0] state;
-assign {Qbgd, Qbad, Qbg, Qbgi, Qsd, Qs, Qsi, Qi} = state;
+reg [6:0] state;
+assign {Qbgd, Qbg, Qbgi, Qsd, Qs, Qsi, Qi} = state;
 
 always @(posedge Clk, posedge Start_Sum)
 begin
@@ -79,18 +73,7 @@ begin
 	if(Reset)
 	begin
         state <= IDLE;
-
         // set all values to XXX to avoid recirculating mux from keeping track of unecessary values
-        red_out <= 8'bXXXXXXXX; // change based on num_pixels (should be of size 8 * num_pixels)
-        green_out <= 8'bXXXXXXXX; // change based on num_pixels
-        blue_out <= 8'bXXXXXXXX; // change based on num_pixels
-
-        counter <= 1'bX; // 8 * num_pixels
-
-        red_sum <= 8'bXXXXXXXX; // change based on num_pixels (should be of size 8 * num_pixels)
-        green_sum <= 8'bXXXXXXXX; // change based on num_pixels
-        blue_sum <= 8'bXXXXXXXX; // change based on num_pixels
-
 		temp_r <= 8'bXXXXXXXX;
 		temp_g <= 8'bXXXXXXXX;
 		temp_b <= 8'bXXXXXXXX;
@@ -100,18 +83,7 @@ begin
 		IDLE:
 		begin
 			state <= IDLE;
-
 	        // set all values to XXX to avoid recirculating mux from keeping track of unecessary values
-	        red_out <= 8'bXXXXXXXX; // change based on num_pixels (should be of size 8 * num_pixels)
-	        green_out <= 8'bXXXXXXXX; // change based on num_pixels
-	        blue_out <= 8'bXXXXXXXX; // change based on num_pixels
-
-	        counter <= 1'bX; // 8 * num_pixels
-
-	        red_sum <= 8'bXXXXXXXX; // change based on num_pixels (should be of size 8 * num_pixels)
-	        green_sum <= 8'bXXXXXXXX; // change based on num_pixels
-	        blue_sum <= 8'bXXXXXXXX; // change based on num_pixels
-
 			temp_r <= 8'bXXXXXXXX;
 			temp_g <= 8'bXXXXXXXX;
 			temp_b <= 8'bXXXXXXXX;
@@ -124,17 +96,6 @@ begin
 	        red_sum <= 0;
 	        green_sum <= 0;
 	        blue_sum <= 0;
-	        index <= 0;
-	        i <= 0;
-
-	        // map 1D vector to 2D vector
-	        // for(i = 0; i < num_pixels * 8; i=i+8)
-	        // begin
-	        // 	red[index +:8] <= {red_in[i+7], red_in[i+6], red_in[i+5], red_in[i+4], red_in[i+3], red_in[i+2], red_in[i+1], red_in[i]};
-	        // 	green[index +:8] <= {green_in[i+7], green_in[i+6], green_in[i+5], green_in[i+4], green_in[i+3],  green_in[i+2], green_in[i+1], green_in[i]};
-	        // 	blue[index +:8] <= {blue_in[i+7], blue_in[i+6], blue_in[i+5], blue_in[i+4], blue_in[i+3],  blue_in[i+2], blue_in[i+1], blue_in[i]};
-	        // 	index <= index + 1;
-	        // end
 	      end
 	    SUM_ADD: 
 	      begin
@@ -144,13 +105,12 @@ begin
 	        	state <= SUM_ADD;
 	        end
 	        red_sum <= red_sum + {red_in[counter*8+7], red_in[counter*8+6], red_in[counter*8+5], red_in[counter*8+4], red_in[counter*8+3], red_in[counter*8+2], red_in[counter*8+1], red_in[counter*8]};
-	        green_sum <= green_sum + {green_in[counter*8+7], green_in[counter*8+6], red_in[counter*8+5], green_in[counter*8+4], green_in[counter*8+3], green_in[counter*8+2], green_in[counter*8+1], green_in[counter*8]};
+	        green_sum <= green_sum + {green_in[counter*8+7], green_in[counter*8+6], green_in[counter*8+5], green_in[counter*8+4], green_in[counter*8+3], green_in[counter*8+2], green_in[counter*8+1], green_in[counter*8]};
 	        blue_sum <= blue_sum + {blue_in[counter*8+7], blue_in[counter*8+6], blue_in[counter*8+5], blue_in[counter*8+4], blue_in[counter*8+3], blue_in[counter*8+2], blue_in[counter*8+1], blue_in[counter*8]};
 	        counter <= counter + 1;
 	      end
 		SUM_DONE:
 		begin  
-		 // state transitions in the control unit
 		 if (Ack)
 		   state <= IDLE;
 		end    
@@ -158,22 +118,12 @@ begin
 	      begin
 	        state <= BG_REPLACE;
 	        counter <= 0;
-	        i <= 0;
-	        index <= 0;
 	        distance <= 18'b00000000;
-
-	        // map 1D vector to 2D vector
-	        // for(i = 0; i < num_pixels * 8; i=i+8)
-	        // begin
-	        // 	red[0] <= {red_in[i+7], red_in[i+6], red_in[i+5], red_in[i+4], red_in[i+3], red_in[i+2], red_in[i+1], red_in[i]};
-	        // 	green[0] <= {green_in[i+7], green_in[i+6], green_in[i+5], green_in[i+4], green_in[i+3],  green_in[i+2], green_in[i+1], green_in[i]};
-	        // 	blue[0] <= {blue_in[i+7], blue_in[i+6], blue_in[i+5], blue_in[i+4], blue_in[i+3],  blue_in[i+2], blue_in[i+1], blue_in[i]};
-	        // end
 	      end
 	    BG_REPLACE: 
 	      begin
 	        if(counter == (num_pixels - 1))
-	        	state <= BG_ALMOST_DONE;
+	        	state <= BG_DONE;
 	        else begin
 	        	state <= BG_REPLACE;
 	        end
@@ -246,54 +196,12 @@ begin
 	        end
 	        counter <= counter + 1;
 	      end
-	    BG_ALMOST_DONE: // format as 1D array to return
-	      begin
-			state <= BG_DONE;
-	      	// for(index = 0; index < num_pixels; index=index+1)
-	       //  begin
-	       //  	temp_r = red[0];
-	       //  	red_out[0] = temp_r[0];
-	       //  	red_out[1] = temp_r[1];
-	       //  	red_out[2] = temp_r[2];
-	       //  	red_out[3] = temp_r[3];
-	       //  	red_out[4] = temp_r[4];
-	       //  	red_out[5] = temp_r[5];
-	       //  	red_out[6] = temp_r[6];
-	       //  	red_out[7] = temp_r[7];
-
-	       //  	temp_g = green[0];
-	       //  	green_out[0] = temp_g[0];
-	       //  	green_out[1] = temp_g[1];
-	       //  	green_out[2] = temp_g[2];
-	       //  	green_out[3] = temp_g[3];
-	       //  	green_out[4] = temp_g[4];
-	       //  	green_out[5] = temp_g[5];
-	       //  	green_out[6] = temp_g[6];
-	       //  	green_out[7] = temp_g[7];
-
-	       //  	temp_b = blue[0];
-	       //  	blue_out[0] = temp_b[0];
-	       //  	blue_out[1] = temp_b[1];
-	       //  	blue_out[2] = temp_b[2];
-	       //  	blue_out[3] = temp_b[3];
-	       //  	blue_out[4] = temp_b[4];
-	       //  	blue_out[5] = temp_b[5];
-	       //  	blue_out[6] = temp_b[6];
-	       //  	blue_out[7] = temp_b[7];
-
-	       //  	i = i+8;
-	       //  end
-	      end
 	    BG_DONE:
 	      begin  
-	         // state transitions in the control unit
 	         if (Ack)
 	           state <= IDLE;
 	       end    
 	endcase
-
 end
-
-
 
 endmodule
