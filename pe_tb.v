@@ -9,7 +9,7 @@ module pe_testbench();
 	localparam num_processors = 1;
 	reg Clk;
 	
-	parameter num_pixels = 4;
+	localparam num_pixels = 4;
 
 	// BG REMOVAL VARIABLES
 	reg [7:0] red_exp;
@@ -37,7 +37,7 @@ module pe_testbench();
 	
 	integer i;
 
-	pe processor1(Clk, Ack, Reset, red_exp, green_exp, blue_exp, threshold, desired_bg_r, desired_bg_g, desired_bg_b, Start_Sum, Start_BgRemoval,
+	pe #(num_pixels) processor1(Clk, Ack, Reset, red_exp, green_exp, blue_exp, threshold, desired_bg_r, desired_bg_g, desired_bg_b, Start_Sum, Start_BgRemoval,
 					red_in, green_in, blue_in, red_out, green_out, blue_out,
 					Qi, Qbgi, Qbg, Qbgd, Qsi, Qs, Qsd, red_sum, green_sum, blue_sum);
 	
