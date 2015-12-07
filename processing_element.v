@@ -128,17 +128,15 @@ begin
 	        	state <= BG_REPLACE;
 	        end
 
-	        temp_r <= {red_in[counter*8+7], red_in[counter*8+6], red_in[counter*8+5], red_in[counter*8+4], red_in[counter*8+3], red_in[counter*8+2], red_in[counter*8+1], red_in[counter*8]};
-	        temp_g <= {green_in[counter*8+7], green_in[counter*8+6], red_in[counter*8+5], green_in[counter*8+4], green_in[counter*8+3], green_in[counter*8+2], green_in[counter*8+1], green_in[counter*8]};
-	        temp_b <= {blue_in[counter*8+7], blue_in[counter*8+6], blue_in[counter*8+5], blue_in[counter*8+4], blue_in[counter*8+3], blue_in[counter*8+2], blue_in[counter*8+1], blue_in[counter*8]};
+	        temp_r = {red_in[counter*8+7], red_in[counter*8+6], red_in[counter*8+5], red_in[counter*8+4], red_in[counter*8+3], red_in[counter*8+2], red_in[counter*8+1], red_in[counter*8]};
+	        temp_g = {green_in[counter*8+7], green_in[counter*8+6], red_in[counter*8+5], green_in[counter*8+4], green_in[counter*8+3], green_in[counter*8+2], green_in[counter*8+1], green_in[counter*8]};
+	        temp_b = {blue_in[counter*8+7], blue_in[counter*8+6], blue_in[counter*8+5], blue_in[counter*8+4], blue_in[counter*8+3], blue_in[counter*8+2], blue_in[counter*8+1], blue_in[counter*8]};
 
 	        // calculate distance squared from expected RGB (to avoid square root operation)
-	        distance <= (red_exp - temp_r) * (red_exp - temp_r);
-	        distance <= distance + ((green_exp - temp_g) * (green_exp - temp_g));
-	        distance <= distance + ((blue_exp - temp_b) * (blue_exp - temp_b));
-	        
+	        distance = ((red_exp - temp_r) * (red_exp - temp_r)) + ((green_exp - temp_g) * (green_exp - temp_g)) + ((blue_exp - temp_b) * (blue_exp - temp_b));
+       
 	        // compare to threshold
-	        if(distance > threshold)begin // if true, foreground --> same value
+	        if(distance > (threshold * threshold))begin // if true, foreground --> same value
 	        	red_out[counter*8] <= temp_r[0]; // temp_r is holding red_in
 	        	red_out[counter*8+1] <= temp_r[1];
 	        	red_out[counter*8+2] <= temp_r[2];
