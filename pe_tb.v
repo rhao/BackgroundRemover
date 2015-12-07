@@ -6,9 +6,10 @@ module pe_testbench();
 
 	parameter HalfClkPeriod = 5;
 	localparam ClkPeriod = 2*HalfClkPeriod;
+	localparam num_processors = 1;
 	reg Clk;
 	
-	parameter num_pixels = 1;
+	parameter num_pixels = 4;
 
 	// BG REMOVAL VARIABLES
 	reg [7:0] red_exp;
@@ -52,9 +53,9 @@ module pe_testbench();
 		Reset = 0;
 		#(ClkPeriod);
 		
-		red_in <= 61;
-		green_in <= 133;
-		blue_in <= 198;
+		red_in <= {61,204};
+		green_in <= {133,0};
+		blue_in <= {198,0};
 		Start_Sum <= 1;
 		Start_BgRemoval <= 0;
 		Reset <= 0;
@@ -71,17 +72,21 @@ module pe_testbench();
 			#(HalfClkPeriod);
 		end
 		
+		// TEST: blue, blue, blue, red
 		// set values for background removal
-		red_in <= 61; // rgb of image to analyze
-		green_in <= 133;
-		blue_in <= 198;
-		threshold <= 30; // threshold value
-		red_exp <= 61; // TODO: change to adding red_out of each processor and dividing by n
-		green_exp <= 133;
-		blue_exp <= 198;
-		desired_bg_r <= 10; // new background rgb
-		desired_bg_g <= 10;
-		desired_bg_b <= 10;
+		red_in <= {61,61,61,204};
+		green_in <= {133,133,133,0};
+		blue_in <= {198,198,198,0};
+		threshold <= 60; // threshold value
+
+		red_exp <= red_sum / num_processors; // TODO: red_sum1 + red_sum2 for the different processors
+		green_exp <= green_sum / num_processors;
+		blue_exp <= blue_sum / num_processors;
+
+		desired_bg_r <= 106; // new background rgb (light green)
+		desired_bg_g <= 168;
+		desired_bg_b <= 79;
+
 		Start_BgRemoval <= 1; // signal bg removal to start
 		#(ClkPeriod);
 		Start_BgRemoval <= 0;
@@ -92,11 +97,11 @@ module pe_testbench();
 		end
 
 		$display("Pixels after background replacement are: ");
-		for(i = 0; i < 1; i = i + 1) begin
+		for(i = 0; i < num_pixels; i = i + 1) begin
 			output_red = {red_out[i*8+7], red_out[i*8+6], red_out[i*8+5], red_out[i*8+4], red_out[i*8+3], red_out[i*8+2], red_out[i*8+1], red_out[i*8]};
 			output_green = {green_out[i*8+7], green_out[i*8+6], green_out[i*8+5], green_out[i*8+4], green_out[i*8+3], green_out[i*8+2], green_out[i*8+1], green_out[i*8]};
 			output_blue = {blue_out[i*8+7], blue_out[i*8+6], blue_out[i*8+5], blue_out[i*8+4], blue_out[i*8+3], blue_out[i*8+2], blue_out[i*8+1], blue_out[i*8]};
-			$display("%d, %d, %d; ", output_red, output_green, output_blue);
+			$display("%d,%d,%d;", output_red, output_green, output_blue);
 		end
 		
 		$display("The current simulation time is: %d ", $time);
