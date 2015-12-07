@@ -1,5 +1,5 @@
-module pe(Clk, Ack, Reset, red_exp, green_exp, blue_exp, threshold, desired_bg, Start_Sum, Start_BgRemoval,
-	red_in, green_in, blue_in, red_out, green_out, blue_out,
+module pe(Clk, Ack, Reset, red_exp, green_exp, blue_exp, threshold, desired_bg_r, desired_bg_g, desired_bg_b,
+	Start_Sum, Start_BgRemoval, red_in, green_in, blue_in, red_out, green_out, blue_out,
 	Qi, Qbgi, Qbg, Qbgd, Qbad, Qsi, Qs, Qsd, red_sum, green_sum, blue_sum);
 
 parameter num_pixels = 1; // number of pixels that each processing element analyzes
@@ -9,7 +9,7 @@ input [8:0] red_exp;
 input [8:0] green_exp;
 input [8:0] blue_exp;
 input threshold;
-input [8:0] desired_bg;
+input [8:0] desired_bg_r, desired_bg_g, desired_bg_b;
 input Start_Sum, Start_BgRemoval, Clk, Reset, Ack;
 
 output Qi, Qbgi, Qbg, Qbgd, Qbad, Qsi, Qs, Qsd;

@@ -15,7 +15,7 @@ module pe_testbench();
 	reg [8:0] green_exp;
 	reg [8:0] blue_exp;
 	reg threshold;
-	reg [8:0] desired_bg;
+	reg [8:0] desired_bg_r, desired_bg_g, desired_bg_b;
 	reg Start_Sum, Start_BgRemoval, Reset, Ack;
 
 	//reg Qi, Qbgi, Qbg, Qbgd, Qbad, Qsi, Qs, Qsd;
@@ -54,14 +54,10 @@ module pe_testbench();
 		red_in <= 61;
 		green_in <= 133;
 		blue_in <= 198;
-		red_exp <= 61;
-		green_exp <= 133;
-		blue_exp <= 198;
 		Start_Sum <= 1;
 		Start_BgRemoval <= 0;
 		Reset <= 0;
 		Ack <= 0;
-		desired_bg <= 10;
 		
 		#(ClkPeriod);
 		
@@ -70,7 +66,18 @@ module pe_testbench();
 		
 		#50;
 		
-		Start_BgRemoval <= 1;
+		// set values for background removal
+		red_in <= 61; // rgb of image to analyze
+		green_in <= 133;
+		blue_in <= 198;
+		threshold <= 30; // threshold value
+		red_exp <= 61; // TODO: change to adding red_out of each processor and dividing by n
+		green_exp <= 133;
+		blue_exp <= 198;
+		desired_bg_r <= 10; // new background rgb
+		desired_bg_g <= 10;
+		desired_bg_b <= 10;
+		Start_BgRemoval <= 1; // signal bg removal to start
 		#(ClkPeriod);
 		Start_BgRemoval <= 0;
 		
